@@ -120,7 +120,7 @@ int main()
         }
         else if (strcmp(operation, "show") == 0)
         {
-            show(current);
+            show(&current);
         }
     }
 
