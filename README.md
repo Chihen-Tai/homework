@@ -1,2 +1,2 @@
-reversec和XOR是我寫開心的 應該不會考
+reverse和XOR是我寫開心的 應該不會考
 z開頭是我練習用的
