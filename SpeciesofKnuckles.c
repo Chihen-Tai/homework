@@ -20,9 +20,11 @@ int main()
         for (int i = 0; i < n; i++)
         {
             a[count[i] - 96]++;
+            //printf("[%d-%d]",a[i],count[i] - 96);
         }
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i <= 26; i++)
         {
+            
             if (a[i] > 1)
             {
                 printf("I'm the god of Knuckles!\n");
@@ -30,7 +32,7 @@ int main()
                 break;
             }
         }
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i <= 26; i++)
         {
             if (a[i] < 2)
             {
