@@ -51,17 +51,38 @@ void erase1(Node **head, int index)
 
 void erase2(Node **head, char *color)
 {
-    Node *now = *head, *prev = NULL;
-    while (now != NULL)
+    Node **pp =head;
+    Node *entry = *head;
+	while (entry != NULL)
     {
-        if (strcmp(color, now->color) == 0)
+        if (strcmp(color, entry->color) == 0)
         {
-            prev->next = now->next;
-            free(now); // now not have memeory
-            now = prev;
+           *pp = entry->next;
+            //pp = &entry->next;
+            //free(entry);
         }
-        prev = now;
-        now = now->next;
+        else
+        {
+			pp = &entry->next;
+        }
+        entry = entry->next;
+    }
+}
+
+void erase3(Node**head,char*color)
+{
+    Node *now=*head,*prev=NULL;
+    while(now!=NULL)
+    {
+        if(strcmp(now->color,color)==0)
+        {
+            prev->next=now->next;
+            // free(now);
+            // now=prev;
+        }
+        else
+            prev=now;
+        now=now->next;
     }
 }
 

@@ -7,7 +7,6 @@ typedef struct Node
     struct Node *next, *prev;
 } Node;
 
-Node *now;
 
 Node *createNode(int value)
 {
@@ -19,7 +18,7 @@ Node *createNode(int value)
 
 void insert(Node **current, int value, int count)
 {
-    now = *current;
+    Node *now = *current;
     while (count--)
     {
         Node *newNode = createNode(value);
@@ -32,9 +31,9 @@ void insert(Node **current, int value, int count)
     }
 }
 
-void erase(Node **current, int count)
+void erase(Node *current, int count)
 {
-    now = *current;
+    Node *now = current;
     while (count--)
     {
         Node *toDelete = now->next;
@@ -46,7 +45,7 @@ void erase(Node **current, int count)
 
 void move(Node **current, int steps)
 {
-    now = *current;
+    Node *now = *current;
     int list_size = 0;
 
     // Calculate list size
@@ -110,7 +109,7 @@ int main()
         {
             int count;
             scanf("%d", &count);
-            erase(&current, count);
+            erase(current, count);
         }
         else if (strcmp(operation, "move") == 0)
         {
@@ -120,7 +119,7 @@ int main()
         }
         else if (strcmp(operation, "show") == 0)
         {
-            show(&current);
+            show(current);
         }
     }
 

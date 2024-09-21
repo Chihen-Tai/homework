@@ -45,7 +45,8 @@ int solveJosephus(Node **head, int step)
         //-1 because we need to go to the previous node
         //+n avoid negative value
         // second % to range in 0 to n-1(not necessary)
-        tmp = *head;
+        Node *tmp = *head;
+        // Node*tmp=head;
         for (int i = 0; i < actaulsstep; i++)
         {
             tmp = tmp->next;
