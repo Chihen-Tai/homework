@@ -16,18 +16,19 @@ int main()
         {
             scanf("%d", &a[i]);
         }
-        
+
         for (int i = 0; i < q; i++)
         {
             if (a[i] < cur_min)
             {
                 cur_min = a[i];
             }
-            else if(a[i] - cur_min > max_profit)
+            else if (a[i] - cur_min > max_profit)
             {
                 max_profit = a[i] - cur_min;
             }
         }
+        
         printf("%d\n", max_profit);
     }
 }
