@@ -19,14 +19,15 @@ Node *buildTree(int *Inorder, int *postorder, int inorder_start, int inorder_end
     root->number = postorder[postorder_index];
     postorder_index--;
 
-    int inorder_index;
-    for (inorder_index = inorder_start; inorder_index <= inorder_end; inorder_index++)
+    int inorder_index = 0;
+    for (int i = inorder_start; i <= inorder_end; i++)
     {
-        if (Inorder[inorder_index] == root->number)
+        if (Inorder[i] == root->number)
         {
-            break;
+            inorder_index = i;
         }
     }
+
 
     root->ptr_to_right_node = buildTree(Inorder, postorder, inorder_index + 1, inorder_end);
     root->ptr_to_left_node = buildTree(Inorder, postorder, inorder_start, inorder_index - 1);
@@ -46,6 +47,7 @@ void showpreorder(Node *root)
         printf("%d ", root->number);
         showpreorder(root->ptr_to_left_node);
         showpreorder(root->ptr_to_right_node);
+        postorder_index = n - 1;
     }
 }
 

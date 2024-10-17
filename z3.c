@@ -1,132 +1,89 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<string.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+int a[2000005];
+int q, n;
 
 typedef struct _Node
 {
-    char color[10];
-    struct _Node *next;
-}Node;
+    int data, id;
+    struct _Node *left, *right;
+} Node;
 
-void insert(Node**, char*, int);
-
-void erase1(Node**, int);
-
-void erase2(Node**, char*);
-
-void reverse(Node**, int, int);
-
-void show(Node **head) {
-    Node *now = (*head)->next;
-    while(now!=NULL) {
-        printf("%s ", now->color);
-        now = now->next;
-    }
-    puts("");
-}
-
-int n;
-char buf[100];
-int num1, num2;
-Node *head;
-
-int main() {
-    head = (Node*)malloc(sizeof(Node)); // create an empty node
-    memset(head->color,'\0',sizeof(head->color));
-    head->next = NULL;
-    scanf("%d",&n);
-    while(n--) {
-        scanf("%s",buf);
-        if(!strcmp(buf,"insert")) {
-            scanf("%s%d",buf,&num1);
-            insert(&head, buf, num1); // insert <color> <dest>
-        }
-        else if(!strcmp(buf,"erase1")) {
-            scanf("%d",&num1);
-            erase1(&head, num1); // erase1 <dest>
-        }
-        else if(!strcmp(buf,"erase2")) {
-            scanf("%s",buf);
-            erase2(&head, buf); // erase2 <color>
-        }
-        else if(!strcmp(buf,"reverse")) {
-            scanf("%d%d",&num1,&num2);
-            reverse(&head, num1, num2); // reverse <dest1> <dest2>
-        }
-        else if(!strcmp(buf,"show")) {
-            show(&head);
-        }
-    }
-    return 0;
-}
-void insert(Node**head,char*color,int idx)
+void build_tree(Node **now, int *arr, int l, int r)
 {
-    Node*now=*head;
-    for(int i=0;now->next!=NULL&&i!=idx;i++)
-    {
-        now=now->next;
-    }
-
-    Node*new=(Node*)malloc(sizeof(Node));
-
-    strcpy(new->color,color);
-
-    new->next=now->next;
-    now->next=new;
-}
-
-void erase1(Node**head,int idx)
-{
-    Node*now=*head;
-    Node*prev=NULL;
-    for(int i=0;now->next!=NULL&&i!=idx;i++)
-    {
-        prev=now;
-        now=now->next;
-    }
-    if(prev==NULL)
-    {
+    if (l > r)
         return;
+    (*now) = (Node *)malloc(sizeof(Node));
+    (*now)->left=(*now)->right=NULL;
+    if (l == r)
+    {
+        (*now)->data=arr[l];
+        (*now)->id=l;
     }
-    prev->next=now->next;
-    free(now);
-    now=prev;
+    else
+    {
+        int mid=(l+r)/2;
+        (*now)->data=arr[mid];
+        (*now)->id=mid;
+        build_tree(&(*now)->left,arr,l,mid-1);
+        build_tree(&(*now)->right,arr,mid+1,r);
+    }
 }
 
-void erase2(Node**head,char*color)
+int search(Node *now, int x)
 {
-    Node*now=*head;
-    Node*prev=NULL;
-    for(int i=0;now!=NULL;i++)//now!=NULL
+    if (now == NULL)
+        return -1;
+    if(now->data==x)
     {
-        if(strcmp(now->color,color)==0)
+        return now->id;
+    }
+    if(now->data<x)
+    {
+        return search(now->right,x);
+    }
+    if(now->data>x)
+    {
+        return search(now->left,x);
+    }
+}
+
+
+void freeBST(Node *root)
+{
+    if (root == NULL)
+        return;
+    freeBST(root->left);
+    freeBST(root->right);
+    free(root);
+}
+
+int main()
+{
+    while (scanf("%d %d", &n, &q) != EOF)
+    {
+        Node *root = NULL;
+        for (int i = 0; i < n; i++)
         {
-            prev->next=now->next;
-            free(now);
-            now=prev;
+            scanf("%d", &a[i]);
         }
-        prev=now;
-        now=now->next;
-    }
-}
-
-void reverse(Node**head,int first,int last)
-{
-    int idx;
-    Node*now=*head;
-    Node*left=NULL;
-    for(idx=0;now->next!=NULL&&idx!=first;idx++)
-    {
-        left=now;
-        now=now->next;
-    }
-    while(idx!=last&&now->next!=NULL)
-    {
-        Node*next=now->next;
-        now->next=next->next;
-        next->next=left->next;
-        left->next=next;
-        idx++;
-    }
-
+        build_tree(&root, a, 0, n - 1);
+        for (int i = 0; i < q; i++)
+        {
+            int x;
+            scanf("%d",&x);
+            int ans = search(root, x);
+            if (ans == -1)
+            {
+                printf("Break your bridge\n");
+            }
+            else
+            {
+                printf("%d\n",ans+1);
+            }
+           
+        }
+        freeBST(root);
+    } 
 }

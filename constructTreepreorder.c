@@ -25,8 +25,7 @@ Node *buildTree(int *Inorder, int *Preorder, int inorder_start, int inorder_end)
     {
         if (Inorder[i] == root->number)
         {
-            inorder_index = i;
-        }
+            inorder_index = i;        }
     }
 
     root->ptr_to_left_node = buildTree(Inorder, Preorder, inorder_start, inorder_index - 1);

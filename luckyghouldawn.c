@@ -51,7 +51,7 @@ int search(Node *now, int target)
 void insert(Node **root, int x)
 {
     /*do it your self*/
-}
+}       
 
 void freeBST(Node *root)
 {
