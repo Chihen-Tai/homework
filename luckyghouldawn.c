@@ -89,3 +89,28 @@ int main()
         freeBST(root);
     }   
 }
+/*
+Node* buildtree(Node*root,int*a,int start,int end)
+{
+    if(start>end)
+        return NULL;
+    root=(Node*)malloc(sizeof(Node));
+    root->left=NULL;
+    root->right=NULL;
+    if(start==end)
+    {
+        root->id=start;
+        root->data=a[start];
+    }
+    else
+    {
+        int mid=(start+end)/2;
+        root->id=mid;
+        root->data=a[mid];
+        root->left=buildtree(root->left,a,start,mid-1);
+        root->right=buildtree(root->right,a,mid+1,end);
+    }
+    return root;
+}
+
+*/
