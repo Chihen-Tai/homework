@@ -28,7 +28,7 @@ int main()
                 max_profit = a[i] - cur_min;
             }
         }
-        
+
         printf("%d\n", max_profit);
     }
 }

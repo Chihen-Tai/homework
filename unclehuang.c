@@ -21,7 +21,7 @@ Node *createList(int n)
         cur->number = i;
     }
     cur->next = p;
-
+    
     return p;
 }
 void freeList(Node *head)
