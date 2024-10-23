@@ -1,89 +1,69 @@
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
-
+int n, q;
 int a[2000005];
-int q, n;
-
 typedef struct _Node
 {
-    int data, id;
+    int num, id;
     struct _Node *left, *right;
 } Node;
 
-void build_tree(Node **now, int *arr, int l, int r)
+Node *buildtree(int *a, int start, int end)
 {
-    if (l > r)
-        return;
-    (*now) = (Node *)malloc(sizeof(Node));
-    (*now)->left=(*now)->right=NULL;
-    if (l == r)
+    if (start > end)
+        return NULL;
+    Node *root = (Node *)malloc(sizeof(Node));
+    if (start == end)
     {
-        (*now)->data=arr[l];
-        (*now)->id=l;
+        root->id = start;
+        root->num = a[start];
     }
     else
     {
-        int mid=(l+r)/2;
-        (*now)->data=arr[mid];
-        (*now)->id=mid;
-        build_tree(&(*now)->left,arr,l,mid-1);
-        build_tree(&(*now)->right,arr,mid+1,r);
+        int mid = (start + end) / 2;
+        root->id = mid;
+        root->num = a[mid];
+        root->left = buildtree(a, start, mid - 1);
+        root->right = buildtree(a, mid + 1, end);
     }
-}
 
-int search(Node *now, int x)
+    return root;
+}
+int search(Node*now,int x)
 {
-    if (now == NULL)
+    if(now==NULL)//easy to use = it is dangerous rem us ==
         return -1;
-    if(now->data==x)
-    {
+    else if(now->num==x)
         return now->id;
-    }
-    if(now->data<x)
-    {
-        return search(now->right,x);
-    }
-    if(now->data>x)
-    {
+    else if(now->num>x)
         return search(now->left,x);
-    }
+    else if(now->num<x)
+        return search(now->right,x);
 }
-
-
-void freeBST(Node *root)
-{
-    if (root == NULL)
-        return;
-    freeBST(root->left);
-    freeBST(root->right);
-    free(root);
-}
-
 int main()
 {
-    while (scanf("%d %d", &n, &q) != EOF)
+    while(scanf("%d%d", &n, &q)!=EOF)
     {
-        Node *root = NULL;
         for (int i = 0; i < n; i++)
+    {
+        scanf("%d", &a[i]);
+    }
+    Node*root=buildtree(a,0,n-1);
+    while(q--)
+    {
+        int x;
+        scanf("%d",&x);
+        int ans=search(root,x);
+        if(ans==-1)
         {
-            scanf("%d", &a[i]);
+                printf("Break your bridge!\n");
         }
-        build_tree(&root, a, 0, n - 1);
-        for (int i = 0; i < q; i++)
+        else
         {
-            int x;
-            scanf("%d",&x);
-            int ans = search(root, x);
-            if (ans == -1)
-            {
-                printf("Break your bridge\n");
-            }
-            else
-            {
-                printf("%d\n",ans+1);
-            }
-           
+            printf("%d\n",ans+1);
         }
-        freeBST(root);
-    } 
+    }
+    }
+    
 }

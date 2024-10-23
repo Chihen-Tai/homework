@@ -2,95 +2,75 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct _Node
+typedef struct _NODE
 {
-    int type;
-    int var;
-    char ch;
-    struct _Node *left,*right;
-}Node;
-
-enum
+    int number;
+    struct _NODE *ptr_to_right_node;
+    struct _NODE *ptr_to_left_node;
+} Node;
+int n;
+int preorder_idx = 0;
+Node *buildTree(int *inorder, int *preorder, int start, int end)
 {
-    NUM,
-    VAR,
-    OP
-};
-Node*newNode(int type,int var,char ch)
-{
-    Node*new=(Node*)malloc(sizeof(Node));
-    new->type=type;
-    new->var=var;
-    new->ch=ch;
-    new->right=new->left=NULL;
-    return new;
-}
-Node*buildTree()
-{
-    char exp[2000005];
-    scanf("%s",exp);
-    Node*now=NULL;
-    if('x'<=exp[0]&&'z'>=exp[0])
-    {
-        now=newNode(VAR,0,exp[0]);
-    }
-    else if('0'<=exp[0]&&'9'>=exp[0])
-    {
-        now=newNode(NUM,atoi(exp),'\0');
-    }
+    if (start > end)
+        return NULL;
     else
     {
-        now=newNode(OP,0,exp[0]);
-        now->left=buildTree();
-        now->right=buildTree();
-    }
-    return now;
-}
+        Node *root = (Node *)malloc(sizeof(Node));
+        root->number = preorder[preorder_idx];
+        preorder_idx++;
 
-int showans(Node*root,int x,int y,int z)
-{
-    if(root==NULL)
-        return 0;
-    switch (root->type)
-    {
-        case NUM:
-            printf("%d",root->var);
-            return root->var;
-            break;
-        case VAR:
-            printf("%c",root->ch);
-            if(root->ch=='x')
-                return x;
-            else if (root->ch=='y')
-                return y;
-            else if (root->ch=='z')
-                return z;
-            break;
-        case OP:
-        {   
-            int l=showans(root->left,x,y,z);
-            printf("%c",root->ch);
-            int r=showans(root->right,x,y,z);
-            if(root->ch=='+')
-                return l+r;
-            else if (root->ch=='-')
-                return l-r;
-            else if (root->ch=='*')
-                return l*r;
-            else if (root->ch=='/')
-                return l/r;
-            break;
+        int inorder_idx=0;
+        for (int i = start; i <= end; i++)//remember add <=
+        {
+            if (inorder[i] == root->number)
+            {
+                inorder_idx = i;
+            }
         }
+        root->ptr_to_left_node = buildTree(inorder, preorder, start, inorder_idx - 1);
+        root->ptr_to_right_node = buildTree(inorder, preorder, inorder_idx + 1, end);
+        return root;
     }
 }
-
-int main()
+void showPostorder(Node *root)
 {
-    Node*root=buildTree();
-    int x,y,z;
-    scanf("%d%d%d",&x,&y,&z);
-    int ans=showans(root,x,y,z);
-    printf("\n");
-    printf("%d",ans);
+    if (root == NULL)
+        return;
+    else
+    {
+        showPostorder(root->ptr_to_left_node);
+        showPostorder(root->ptr_to_right_node);
+        printf("%d ", root->number);
+        preorder_idx=0;
+    }
+}
+void freeTree(Node *root)
+{
+    if (root == NULL)
+        return;
+    else
+    {
+        freeTree(root->ptr_to_left_node);
+        freeTree(root->ptr_to_right_node);
+        free(root);
+    }
+}
+int main(void)
+{
+    int id = 1;
+    while (~scanf("%d", &n))
+    {
+        int inorder[100], preorder[100];
+        for (int i = 0; i < n; i++)
+            scanf("%d", &inorder[i]);
+        for (int i = 0; i < n; i++)
+            scanf("%d", &preorder[i]);
+        Node *root = buildTree(inorder, preorder, 0, n - 1);
+        printf("testcase%d: ", id++);
+        showPostorder(root);
+        printf("\n");
+        freeTree(root);
+    }
     return 0;
 }
