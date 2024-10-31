@@ -1,7 +1,7 @@
 #include <stdio.h>
-int a[200005];
 int n,k;
-void per(int len,int start)
+int a[2000005];
+void permutation(int len,int start)
 {
     if(len==k+1)
     {
@@ -17,12 +17,13 @@ void per(int len,int start)
         for(int i=start;i<=n;i++)
         {
             a[len]=i;
-            per(len+1,i+1);
+            permutation(len+1,i+1);
         }
     }
 }
+
 int main()
 {
     n=5,k=3;
-    per(1,1);
+    pernutation(1,1);
 }

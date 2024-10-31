@@ -2,20 +2,22 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct _Node{
+typedef struct _NODE
+{
     char color[10];
-    struct _Node *next;
-}Node;
+    struct _NODE *next;
+} Node;
+
 
 int n;
-int num1,num2;
 char buf[100];
-Node*head;
+int num1, num2;
+Node *head;
 
 void insert(Node**head,char*color,int index)
 {
-    Node *now=*head;
-    for(int i=0;now->next!=NULL&&i!=index;i++)
+    Node*now=*head;
+    for(int i=0;i!=index&&now->next!=NULL;i++)
     {
         now=now->next;
     }
@@ -66,7 +68,7 @@ void reverse(Node**head,int start,int end)
     {
         left=now;
         now=now->next;
-    }   
+    }
     for(;now->next!=NULL&&idx!=end;idx++)
     {
         Node*next=now->next;

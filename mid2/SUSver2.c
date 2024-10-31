@@ -118,6 +118,5 @@ int main() {
             freeTree(root);
         }
     }
-
     return 0;
 }
