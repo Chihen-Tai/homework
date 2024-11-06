@@ -2,78 +2,72 @@
 #include <set>
 #include <string>
 
+using namespace std;
+
 int main()
 {
     int n;
-    std::string op;
-    std::set<int> s;
-    std::cin>>n;
+    string op;
+    set<int> myset;
+    cin>>n;
     long long sum=0;
     while(n--)
     {
-        std::cin>>op;
+        cin>>op;
         if(op=="insert")
         {
             int x;
-            std::cin>>x;
-            if(s.find(x)!=s.end())//not find return s.end()
+            cin>>x;
+            if(myset.find(x)!=myset.end())
             {
                 continue;
             }
-            /*
-            if(s.count(x)>0)
-            {
-                continue;
-            }
-            */
             sum+=x;
-            s.insert(x);
-            
+            myset.insert(x);
         }
         else if(op=="print")
         {
-            if(s.empty())
+            if(myset.empty())
             {
                 continue;
             }
-            for(auto it=s.begin();it!=s.end();it++)
+            for(auto it=myset.begin();it!=myset.end();it++)
             {
-                if(it==s.begin())
+                if(it==myset.begin())
                 {
-                    std::cout<<*it;
+                    cout<<*it;
                 }
                 else
                 {
-                    std::cout<<" "<<*it;
+                    cout<<" "<<*it;
                 }
+                cout<<endl;
             }
-            std::cout<<std::endl;
         }
         else if(op=="min")
         {
-            if(s.empty())
+            if(myset.empty())
             {
                 continue;
             }
-            std::cout<<*s.begin()<<std::endl;
+            cout<<*myset.begin()<<endl;
         }
         else if(op=="range_erase")
         {
             int l,r;
-            std::cin>>l>>r;
+            cin>>l>>r;
 
-            auto L=s.lower_bound(l);
-            auto R=s.upper_bound(r);
+            auto L=myset.lower_bound(l);
+            auto R=myset.upper_bound(r);
             for(auto it=L;it!=R;it++)
             {
                 sum-=*it;
             }
-            s.erase(L,R);
+            myset.erase(L,R);
         }
         else if(op=="sum")
         {
-            std::cout<<sum<<std::endl;
+            cout<<sum<<endl;
         }
-    }    
-    
+    }
 }
