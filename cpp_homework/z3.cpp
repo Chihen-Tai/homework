@@ -1,21 +1,21 @@
 #include <iostream>
 #include <iomanip>
-#include <vector>
-
+#include <string>
 int n,r;
-const int MAX_N=2005;
-int x[MAX_N],y[MAX_N];
-bool visted[MAX_N];
-bool connected(int i,int j)
+const int max=2005;
+int x[max],y[max];
+bool visit[max];
+
+int connected(int i,int j)
 {
-    int L=(x[i]-x[j])*(x[i]-x[j])+(y[i]-y[j])*(y[i]-y[j]);
+    int L=(x[i]-x[j])*(x[i]-x[j])+(y[i]-y[j])*(y[i]-[j]);
     int R=r*r;
     return L<=R;
 }
 
 int dfs(int now)
 {
-    visted[now]=true;
+    visit[now]=true;
     int res=1;
     for(int i=0;i<n;i++)
     {
@@ -23,7 +23,7 @@ int dfs(int now)
         {
             continue;
         }
-        if(visted[now]==true)
+        if(visit[i]==true)
         {
             continue;
         }
@@ -45,16 +45,18 @@ int main()
 
     for(int i=0;i<n;i++)
     {
-        if(visted[i]==true)
+        if(visit[i]==true)
         {
             continue;
         }
+
         int size=dfs(i);
+
         if(size==1)
         {
             single++;
         }
-        else 
+        else
         {
             group++;
         }

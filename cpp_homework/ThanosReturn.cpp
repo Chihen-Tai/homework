@@ -76,7 +76,7 @@ Matrix operator* (const Matrix &x,const Matrix &y)
                 res[i][j] += (x[i][k] * y[k][j])%mod;
                 res[i][j] =((res[i][j])%mod+mod)%mod;
             }
-        }
+            }
     }
     return res;
 }
