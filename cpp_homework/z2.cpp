@@ -1,71 +1,65 @@
 #include <iostream>
-#include <set>
-#include <string>
-
+#include <iomanip>
 using namespace std;
+int n;
+int r;
+const int MAX_N=2005;
+int x[MAX_N];
+int y[MAX_N];
+bool visited[MAX_N];
+bool connected(int i,int j)
+{
+    int L=(x[i]-x[j])*(x[i]-x[j])+(y[i]-y[j])*(y[i]-y[j]);
+    int R=r*r;
+    return L<=R;
+}
+
+int dfs(int now)
+{
+    visited[now]=true;
+    int res=1;
+    for(int i=0;i<n;i++)
+    {
+        if(connected(now,i)==false)
+        {
+            continue;
+        }
+        if(visited[i]==true)
+        {
+            continue;
+        }
+        res+=dfs(i);
+    }
+
+    return res;
+}
+
 int main()
 {
-    int n;
-    string op;
-    set<int> s;
-    cin>>n;
-    long long sum =0;
-    while(n--)
+    cin>>n>>r;
+    for(int i=0;i<n;i++)
     {
-        cin>>op;
-        if(op=="insert")
+        cin>>x[i]>>y[i];
+    }
+
+    int single=0;
+    int group=0;
+
+    for(int i=0;i<n;++i)
+    {
+        if(visited[i]==true)
         {
-            int x;
-            cin>>x;
-            if(s.find(x)!=s.end())
-            {
-                continue;
-            }
-            sum+=x;
-            s.insert(x);
+            continue;
         }
-        else if(op=="print")
+        int size=dfs(i);
+        if(size==1)
         {
-            if(s.empty())
-            {
-                continue;
-            }
-            for(auto it=s.begin();it!=s.end();it++)
-            {
-                if(it==s.begin())
-                {
-                    cout<<*it;
-                }
-                else
-                {
-                    cout<<" "<<*it;
-                }
-                cout<<endl;
-            }
+            single++;
         }
-        else if(op=="min")
+        else
         {
-            if(s.empty())
-            {
-                continue;
-            }
-            cout<<*s.begin()<<endl;
-        }
-        else if(op=="range_erase")
-        {
-            int l,r;
-            cin>>l>>r;
-            auto L=s.lower_bound(l);
-            auto R=s.upper_bound(r);
-            for(auto it=L;it!=R;it++)
-            {
-                sum-=*it;
-            }
-            s.erase(L,R);
-        }
-        else if(op=="sum")
-        {
-            cout<<sum<<endl;
+            group++;
         }
     }
+    cout<<single<<" "<<group<<endl;
 }

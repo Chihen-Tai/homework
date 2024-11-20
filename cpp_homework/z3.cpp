@@ -8,7 +8,7 @@ bool visit[max];
 
 int connected(int i,int j)
 {
-    int L=(x[i]-x[j])*(x[i]-x[j])+(y[i]-y[j])*(y[i]-[j]);
+    int L=(x[i]-x[j])*(x[i]-x[j])+(y[i]-y[j])*(y[i]-y[j]);
     int R=r*r;
     return L<=R;
 }

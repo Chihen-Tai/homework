@@ -1,57 +1,103 @@
-#include <stdio.h>
-#include <stdlib.h>
-int n,r;
-
-typedef struct
+#include <iostream>
+#include <iomanip>
+#include <cstring>
+using namespace std;
+const int mod = 10007;
+const int MAX_N = 102;
+class Matrix
 {
-    int x[2005];
-    int y[2005];
-    int visit[2005];
-}plane;
+public:
+    Matrix()
+    {
+        row = col = 0;
+        memset(mat, 0, sizeof(mat));
+    }
+    // TODO
+    Matrix(int r, int c);
+    const int &getrow()
+    {
+        return row;
+    }
+    const int &getcol()
+    {
+        return col;
+    }
+    // TODO
+    int *operator[](const int &x);
+    const int *operator[](const int &x) const
+    {
+        return mat[x];
+    }
+    // TODO
+    Matrix operator+(const Matrix &x) const;
+    // TODO: note that this function is declared with the keyword "friend"
+    friend Matrix operator*(const Matrix &x, const Matrix &y);
+    void print()
+    {
+        for (int i = 0; i < row; i++)
+        {
+            if (i == 0)
+                std::cout << "/";
+            else if (i == row - 1)
+                std::cout << "\\";
+            else
+                std::cout << "|";
+            for (int j = 0; j < col; j++)
+            {
+                std::cout << std::right << std::setw(8) << mat[i][j];
+            }
+            if (i == 0)
+                std::cout << " \\\n";
+            else if (i == row - 1)
+                std::cout << " /\n";
+            else
+                std::cout << " |\n";
+        }
+    }
 
-plane xy;
+private:
+    int mat[MAX_N][MAX_N];
+    int row, col;
+};
 
-int dis(int i,int j)
+Matrix::Matrix(int r, int c)
 {
-    return (xy.x[i]-xy.x[j])*(xy.x[i]-xy.x[j])+(xy.y[i]-xy.y[j]*(xy.y[i]-xy.y[j]));
+    row = r;
+    col = c;
+    memset(mat, 0, sizeof(mat));
 }
 
-int dfs(int now)
+int *Matrix::operator[](const int &x)
 {
-    xy.visit[now]=1;
-    int res=1;
-    for(int i=0;i<n;i++)
+    return mat[x];
+}
+
+Matrix Matrix::operator+(const Matrix &x) const
+{
+    Matrix res(row, col);
+    for (int i = 0; i < row; i++)
     {
-        if(dis(now,r)<=r*r&&xy.visit[i]==0)
+        for (int j = 0; j < col; j++)
         {
-            res+=dfs(i);
+            res[i][j] = ((mat[i][j] + x[i][j]) % mod + mod) % mod;
         }
     }
     return res;
 }
 
-int main()
+Matrix operator*(const Matrix &x, const Matrix &y)
 {
-    scanf("%d %d",&n,&r);
-    int g1=0, g2=0;
-    for(int i=0;i<n;i++)
+    Matrix res(x.row,y.col);
+    for(int i=0;i<x.row;i++)
     {
-        scanf("%d%d",&xy.x[i],&xy.y[i]);
-    }
-
-    for(int i=0;i<n;i++)
-    {
-        if(xy.visit[i]==0)
+        for(int j=0;j<y.col;j++)
         {
-            if(dfs(i)>=2)
+            for(int k=0;i<x.col;k++)
             {
-                g1++;
+                res[i][j]+=(x[i][k]*y[k][j])%mod;
+                res[i][j]=(res[i][j]%mod+mod)%mod;
             }
-            else 
-                g2++;
         }
     }
-
-    printf("%d %d\n",g2,g1);
-    return 0;
+    return res;
 }
