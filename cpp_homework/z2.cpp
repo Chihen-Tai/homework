@@ -1,65 +1,130 @@
 #include <iostream>
-#include <iomanip>
+#include <cmath>
+
 using namespace std;
-int n;
-int r;
-const int MAX_N=2005;
-int x[MAX_N];
-int y[MAX_N];
-bool visited[MAX_N];
-bool connected(int i,int j)
+class Function
 {
-    int L=(x[i]-x[j])*(x[i]-x[j])+(y[i]-y[j])*(y[i]-y[j]);
-    int R=r*r;
-    return L<=R;
-}
+    public:
+    static Function *parse(stringstream &ss); // this has been implemented
+    virtual Function *differential() = 0;
+    virtual double eval(double) = 0;
+};
 
-int dfs(int now)
+class Constant : public Function
 {
-    visited[now]=true;
-    int res=1;
-    for(int i=0;i<n;i++)
+	public:
+	static Constant *create(const double &value)
     {
-        if(connected(now,i)==false)
-        {
-            continue;
-        }
-        if(visited[i]==true)
-        {
-            continue;
-        }
-        res+=dfs(i);
+        return new Constant(value);
+    }
+	Function *differential() override
+    {
+        return new Constant(0);
+    }
+	double eval(double) override
+    {
+        return value;
     }
 
-    return res;
-}
+    private:
+    double value;
+    Constant(const double &value):value(value){}
+};
 
-int main()
+class Variable : public Function
 {
-    cin>>n>>r;
-    for(int i=0;i<n;i++)
+	public:
+	static Variable *create(const string &name)
     {
-        cin>>x[i]>>y[i];
+        return new Variable(name);
+    }
+	Function *differential() override
+    {
+        return Constant::create(1);
+    }
+	double eval(double value) override
+    {
+        return value;
     }
 
-    int single=0;
-    int group=0;
+    private:
+    string name;
+    Variable(const string &name):name(name){}
+};
 
-    for(int i=0;i<n;++i)
+class Polynomial : public Function
+{
+	public:
+	static Polynomial *create(Function * base, Function *exp)
     {
-        if(visited[i]==true)
+        return new Polynomial(base,exp);
+    }
+	Function *differential() override;
+	double eval(double value) override
+    {
+        return pow(base->eval(value),exp->eval(0));
+    }
+
+    private:
+    Function*base,*exp;
+    Polynomial(Function*base,Function*exp):base(base),exp(exp){}
+};
+
+class Arithmetic : public Function
+{
+	public:
+	static Arithmetic *create(Function *lhs , char op , Function * rhs)
+    {
+        switch(op)
         {
-            continue;
-        }
-        int size=dfs(i);
-        if(size==1)
-        {
-            single++;
-        }
-        else
-        {
-            group++;
+            case '+':
+                return new Arithmetic(lhs,Type::ADD,rhs);
+            case '-':
+                return new Arithmetic(lhs,Type::SUB,rhs);
+            case '*':
+                return new Arithmetic(lhs,Type::MUL,rhs);
+            case '/':
+                return new Arithmetic(lhs,Type::DIV,rhs);
         }
     }
-    cout<<single<<" "<<group<<endl;
-}
+	Function *differential() override
+    {
+        switch(type)
+        {
+            case Type::ADD:
+            case Type::SUB:
+                return new Arithmetic(lhs->differential(),type,rhs->differential());
+            case Type::MUL:
+                return new Arithmetic(lhs)
+        }
+    }
+	double eval(double) override;
+
+    private:
+    enum class Type
+    {
+        ADD,
+        SUB,
+        MUL,
+        DIV
+    };
+    Function *rhs,*lhs;
+    Type type;
+    Arithmetic(Function*lhs,Type type,Function *rhs):lhs(lhs),rhs(rhs),type(type){}
+};
+
+class Sin : public Function
+{
+	public:
+	static Sin *create(Function *);
+	Function *differential() override;
+	double eval(double) override;
+};
+
+class Cos : public Function
+{
+	public:
+	static Cos *create(Function *);
+	Function *differential() override;
+	double eval(double) override;
+};

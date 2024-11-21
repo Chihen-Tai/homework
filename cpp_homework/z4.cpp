@@ -1,103 +1,71 @@
 #include <iostream>
-#include <iomanip>
-#include <cstring>
+#include <tuple>
+#include <queue>
 using namespace std;
-const int mod = 10007;
-const int MAX_N = 102;
-class Matrix
+
+int n, m;
+int destory;
+char table[1001][1001];
+int ans;
+queue<tuple<int, int, int>> q;
+
+void bfs()
 {
-public:
-    Matrix()
+    while (!q.empty())
     {
-        row = col = 0;
-        memset(mat, 0, sizeof(mat));
-    }
-    // TODO
-    Matrix(int r, int c);
-    const int &getrow()
-    {
-        return row;
-    }
-    const int &getcol()
-    {
-        return col;
-    }
-    // TODO
-    int *operator[](const int &x);
-    const int *operator[](const int &x) const
-    {
-        return mat[x];
-    }
-    // TODO
-    Matrix operator+(const Matrix &x) const;
-    // TODO: note that this function is declared with the keyword "friend"
-    friend Matrix operator*(const Matrix &x, const Matrix &y);
-    void print()
-    {
-        for (int i = 0; i < row; i++)
+        auto [x, y, dis] = q.front();
+        q.pop();
+        if (x < 0 || y < 0 || x >= n || y >= m)
         {
-            if (i == 0)
-                std::cout << "/";
-            else if (i == row - 1)
-                std::cout << "\\";
-            else
-                std::cout << "|";
-            for (int j = 0; j < col; j++)
+            continue;
+        }
+        if(table[x][y]=='C')
+        {
+            continue;
+        }
+
+        if(table[x][y]=='T')
+        {
+            --destory;
+            ans=max(ans,dis);
+        }
+
+        table[x][y]='C';
+        q.push({x+1,y,dis+1});
+        q.push({x-1,y,dis+1});
+        q.push({x,y+1,dis+1});
+        q.push({x,y-1,dis+1});
+    }
+}
+int main()
+{
+    destory = ans = 0;
+    cin >> n >> m;
+    for (int i = 0; i < n; i++)
+    {
+        cin >> table[i];
+    }
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < m; j++)
+        {
+            if (table[i][j] == 'I')
             {
-                std::cout << std::right << std::setw(8) << mat[i][j];
+                q.push({i, j, 0});
             }
-            if (i == 0)
-                std::cout << " \\\n";
-            else if (i == row - 1)
-                std::cout << " /\n";
-            else
-                std::cout << " |\n";
-        }
-    }
-
-private:
-    int mat[MAX_N][MAX_N];
-    int row, col;
-};
-
-Matrix::Matrix(int r, int c)
-{
-    row = r;
-    col = c;
-    memset(mat, 0, sizeof(mat));
-}
-
-int *Matrix::operator[](const int &x)
-{
-    return mat[x];
-}
-
-Matrix Matrix::operator+(const Matrix &x) const
-{
-    Matrix res(row, col);
-    for (int i = 0; i < row; i++)
-    {
-        for (int j = 0; j < col; j++)
-        {
-            res[i][j] = ((mat[i][j] + x[i][j]) % mod + mod) % mod;
-        }
-    }
-    return res;
-}
-
-Matrix operator*(const Matrix &x, const Matrix &y)
-{
-    Matrix res(x.row,y.col);
-    for(int i=0;i<x.row;i++)
-    {
-        for(int j=0;j<y.col;j++)
-        {
-            for(int k=0;i<x.col;k++)
+            if (table[i][j] == 'T')
             {
-                res[i][j]+=(x[i][k]*y[k][j])%mod;
-                res[i][j]=(res[i][j]%mod+mod)%mod;
+                destory++;
             }
         }
     }
-    return res;
+    bfs();
+    if(destory!=0)
+    {
+        cout<<"-1\n";
+    }
+    else
+    {
+        cout<<ans<<endl;
+    }
 }

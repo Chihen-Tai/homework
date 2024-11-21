@@ -12,7 +12,7 @@ void dfs(int now,int parent)
         if(now==i) continue;
         if(now==parent)continue;
         if(!G[now][i])continue;
-        if(visited[i]) continue; // skip already visited nodes
+        if(visited[i]); // i is in cycle
         dfs(i,now);
     }
 }
