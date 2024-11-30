@@ -95,10 +95,33 @@ class Arithmetic : public Function
             case Type::SUB:
                 return new Arithmetic(lhs->differential(),type,rhs->differential());
             case Type::MUL:
-                return new Arithmetic(lhs)
+                return new Arithmetic 
+                (new Arithmetic(lhs->differential(),Type::MUL,rhs),
+                Type::ADD,
+                new Arithmetic(lhs,Type::MUL,rhs->differential()));
+            case Type::DIV:
+                return new Arithmetic (new Arithmetic 
+                (new Arithmetic(lhs->differential(),Type::MUL,rhs),
+                Type::SUB,
+                new Arithmetic(lhs,Type::MUL,rhs->differential())),
+                Type::DIV,
+                Polynomial::create(rhs,Constant::create(2)));
         }
     }
-	double eval(double) override;
+	double eval(double value) override
+    {
+        switch(type)
+        {
+            case Type::ADD:
+                return lhs->eval(value)+rhs->eval(value);
+            case Type::SUB:
+                return lhs->eval(value)-rhs->eval(value);
+            case Type::MUL:
+                return lhs->eval(value)*rhs->eval(value);
+            case Type::DIV:
+                return lhs->eval(value)/rhs->eval(value);
+        }
+    }
 
     private:
     enum class Type
@@ -116,15 +139,50 @@ class Arithmetic : public Function
 class Sin : public Function
 {
 	public:
-	static Sin *create(Function *);
+	static Sin *create(Function *base)
+    {
+        return new Sin(base);
+    }
 	Function *differential() override;
-	double eval(double) override;
+	double eval(double val) override
+    {
+        return sin(base->eval(val));
+    }
+
+    private:
+    Sin(Function*base):base(base){}
+    Function *base;
 };
 
 class Cos : public Function
 {
 	public:
-	static Cos *create(Function *);
-	Function *differential() override;
-	double eval(double) override;
+	static Cos *create(Function *base)
+    {
+        return new Cos(base);
+    }
+	Function *differential() override
+    {
+        return Arithmetic::create(Constant::create(0),'-',Arithmetic::create(Sin::create(base),'*',base->differential()));
+    }
+	double eval(double value) override
+    {
+        return cos(base->eval(value));
+    }
+
+    private:
+    Cos(Function*base):base(base){}
+    Function*base;
 };
+
+Function* Polynomial::differential()
+{
+    return Arithmetic::create(Arithmetic::create(
+        Polynomial::create(base,Arithmetic::create(exp,'-',Constant::create(1))),'*',exp),
+        '*',base->differential());
+}
+
+ Function * Sin::differential()
+ {
+    return Arithmetic::create(Cos::create(base),'*',base->differential());
+ }

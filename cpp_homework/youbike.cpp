@@ -1,60 +1,52 @@
 #include <iostream>
-#include <string>
+#include <vector>
 using namespace std;
-bool visited[1000];
-bool G[1000][1000]; 
-int n;
-void dfs(int now,int parent)
+//這題我沒寫出來 草
+vector<bool> visited;
+vector<vector<int>> neighbor;
+int ans;
+
+void dfs(int now, int parent)
 {
-    visited[now]=true;
-    for(int i=0;i<n-1;i++)
+    visited[now] = true;
+    for (int i : neighbor[now])
     {
-        if(now==i) continue;
-        if(now==parent)continue;
-        if(!G[now][i])continue;
-        if(visited[i]); // i is in cycle
-        dfs(i,now);
+        if (i == parent) continue;
+        if (visited[i])
+        {
+            ans = i;
+        }
+        else
+        {
+            dfs(i, now);
+        }
     }
 }
 
 int main()
 {
-    int T;
-    cin>>T;
-    while(T--)
+    int t;
+    cin >>t;
+    while(t--)
     {
-        cin>>n;
-        for(int i=0;i<n;i++)
+        int n;
+        cin >> n;
+        neighbor.resize(n);
+        visited.resize(n);
+        for (int i = 0; i < n; i++)
         {
-            visited[i]=false;
-            for(int j=0;j<n;j++)
-            {
-                G[i][j]=false;
-            }
+            visited[i] = false;
+            neighbor[i].clear();
         }
-        for(int i=0;i<n;i++)
+        for (int i = 0; i < n; i++)
         {
-            int a,b;
-            cin>>a>>b;
-            G[a][b]=G[b][a]=true;
+            int a, b;
+            cin >> a >> b;
+            neighbor[a].push_back(b);
+            neighbor[b].push_back(a);
         }
-        //output all number in the cycle
-        for(int i=0;i<n;i++)
-        {
-            if(!visited[i])
-            {
-                dfs(i,-1);
-            }
-        }
-        //output max number of nodes in the cycle
-        int ans=0;
-        for(int i=0;i<n;i++)
-        {
-            if(visited[i]&&i>ans)
-            {
-                ans=i;
-            }
-        }
-        cout<<ans<<endl;
+        ans = -1;
+        dfs(0, -1);
+        cout << ans << endl;
     }
 }
