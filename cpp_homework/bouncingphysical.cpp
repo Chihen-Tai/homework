@@ -100,6 +100,7 @@ public:
         double dt = 1.0 / fps;
         // object :self-update
         for (Object &object : objects)
+        //direct chane ele in vector
         {
             //- consider gravity
             object.getSpeedY() -= G * dt;
@@ -148,7 +149,6 @@ public:
             if (object.getY()-object.getR()<= 0)
             {
                 object.getSpeedY() = std::abs(object.getSpeedY());
-                //不能加std:: 需要用abs
             }
         }
     }

@@ -1,38 +1,69 @@
 #include <iostream>
+#include <set>
+#include <string>
+#include <vector>
+
 using namespace std;
-using ll=long long;
 
-ll p[1000005];
-
-int n;
-
-ll solve();
+struct cmp
+{
+    bool operator()(const string &a,const string &b) const
+    {
+        if(a.size()!=b.size())
+        {
+            return a.size()<b.size();
+        }
+        return a<b;
+    }
+};
 
 int main()
 {
-    int t;
-    cin>>t;
-    while(t--)
-    {
-        cout<<solve()<<endl;
-    }
-}
-
-ll solve()
-{
-    ll total=0;
+    ios_base::sync_with_stdio(false);
+    cin.tie(0);
+    multiset<string,cmp> mst;
+    vector<string> v;
+    int n;
     cin>>n;
-    for(int i=0;i<n;i++)
+    string op;
+    int idx;
+    string s;
+    while(n--)
     {
-        cin>>p[i];
-    }
-    for(int i=1;i<n;i++)
-    {
-        if(p[i]>p[i-1])
+        cin>>op;
+        if(op=="insert")
         {
-            total+=(p[i]-p[i-1]);
+            cin>>s;
+            mst.insert(s);
+            v.push_back(s);
+        }
+        if(op=="min")
+        {
+            if(!mst.empty())
+            {
+                cout<<*mst.begin()<<endl;
+            }
+        }
+        if(op=="max")
+        {
+            if(!mst.empty())
+            {
+                cout<<*(--mst.end())<<endl;
+            }
+        }
+        if(op=="find")
+        {
+            cin>>idx;
+            if(idx<v.size())
+            {
+                cout<<v[idx-1]<<endl;
+            }
+        }
+        if(op=="amount")
+        {
+            cin>>s;
+            cout<<mst.count(s)<<endl;
         }
     }
-
-    return total;
+    return 0;
 }

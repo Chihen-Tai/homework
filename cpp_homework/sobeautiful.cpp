@@ -40,6 +40,7 @@ int main()
     int n;
     string s;
     map<int ,map<char,int>> words;//words[母音數][最後一個母音]=出現次數
+    //map is like dictionary in python
     cin>>n;
     while(n--)
     {
@@ -58,21 +59,17 @@ int main()
         //count : pair<int,map<char,int>>
         for(auto last:count.second)//last : pair<char,int>
         {
+            //last.second : 出現次數 int
             pair_both+=last.second/2;
             temp+=last.second%2;
         }
         pair_first+=temp/2;
     }
-    int ans=0;
-    if(pair_both<=pair_first)
+    int ans=min(pair_first,pair_both);
+    int diff=pair_both-pair_first;
+    if(diff>=2)
     {
-        //second pair數量不夠
-        //歌詞數量取決於second pair數量
-        ans=pair_both;
-    }
-    else
-    {
-        ans=pair_first+(pair_both-pair_first)/2;
+        ans+=diff/2;
     }
     cout<<ans<<endl;
 }
