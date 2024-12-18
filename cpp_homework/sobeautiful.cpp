@@ -55,10 +55,12 @@ int main()
     int pair_first=0,pair_both=0;
     for(auto count:words)//count : pair<int,map<char,int>>
     {
+        //temp:有相同數量的母音不同的lase_vowel
         int temp=0;
         //count : pair<int,map<char,int>>
         for(auto last:count.second)//last : pair<char,int>
-        {
+        {   
+            //last.first :  他們的最後一個母音 char 都一樣 
             //last.second : 出現次數 int
             pair_both+=last.second/2;
             temp+=last.second%2;

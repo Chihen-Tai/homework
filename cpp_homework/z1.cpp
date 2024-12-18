@@ -1,69 +1,71 @@
 #include <iostream>
-#include <set>
 #include <string>
-#include <vector>
+#include <iomanip>
 
 using namespace std;
 
-struct cmp
+constexpr int MAX_N=2000;
+
+array<bool,MAX_N> visited;
+array<array<bool,26>,MAX_N> hasletter;
+int n;
+
+bool connected(int x,int y)
 {
-    bool operator()(const string &a,const string &b) const
+    for(int i=0;i<26;i++)
     {
-        if(a.size()!=b.size())
+        if(hasletter[x][i]&&hasletter[y][i])
         {
-            return a.size()<b.size();
+            return true;
         }
-        return a<b;
     }
-};
+    return false;;
+}
+void dfs(int now)
+{
+    visited[now]=true;
+    for(int i=0;i<n;i++)
+    {
+        if(visited[i])
+        {
+            continue;
+        }
+        else if(connected(now,i))
+        {
+            dfs(i);
+        }
+    }
+}
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(0);
-    multiset<string,cmp> mst;
-    vector<string> v;
-    int n;
-    cin>>n;
-    string op;
-    int idx;
-    string s;
-    while(n--)
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(0);
+    int t;
+    cin>>t;
+    while(t--)
     {
-        cin>>op;
-        if(op=="insert")
+        visited.fill(false);
+        hasletter.fill({false});
+        cin>>n;
+        for(int i=0;i<n;i++)
         {
-            cin>>s;
-            mst.insert(s);
-            v.push_back(s);
-        }
-        if(op=="min")
-        {
-            if(!mst.empty())
+            string str;
+            cin>>str;
+            for(auto &c:str)
             {
-                cout<<*mst.begin()<<endl;
+                hasletter[i][c-'a']=true;
             }
         }
-        if(op=="max")
+        int ans=0;
+        for(int i=0;i<n;i++)
         {
-            if(!mst.empty())
+            if(!visited[i])
             {
-                cout<<*(--mst.end())<<endl;
+                dfs(i);
+                ans++;
             }
         }
-        if(op=="find")
-        {
-            cin>>idx;
-            if(idx<v.size())
-            {
-                cout<<v[idx-1]<<endl;
-            }
-        }
-        if(op=="amount")
-        {
-            cin>>s;
-            cout<<mst.count(s)<<endl;
-        }
+        cout<<ans<<'\n';
     }
-    return 0;
 }

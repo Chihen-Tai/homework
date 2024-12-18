@@ -1,201 +1,153 @@
-#include<iostream>
-#include<cmath>
-
-using namespace std;
-
-class Function
+#include <iostream>
+#include <cmath>
+class Object
 {
-    public:
-    static Function *parse(stringstream &ss); // this has been implemented
-    virtual Function *differential() = 0;
-    virtual double eval(double) = 0;
+public:
+    Object(double W) : weight{W}, vx{0}, vy{0}, x{0}, y{0}, r{0} {}
+    void setCircle(double X, double Y, double R)
+    {
+        x = X, y = Y, r = R;
+    }
+    void setSpeed(double Vx, double Vy)
+    {
+        vx = Vx, vy = Vy;
+    }
+    double &getSpeedX() { return vx; }
+    double &getSpeedY() { return vy; }
+    double &getX() { return x; }
+    double &getY() { return y; }
+    double &getR() { return r; }
+    const double &getWeight() const { return weight; }
+    const double &getSpeedX() const { return vx; }
+    const double &getSpeedY() const { return vy; }
+    double getVelocity() const { return sqrt(vx * vx + vy * vy); }
+    double getAngle() const { return atan2(vy, vx) * 180.0 / M_PI; }
+    const double &getX() const { return x; }
+    const double &getY() const { return y; }
+    const double &getR() const { return r; }
+
+private:
+    double weight;
+    double vx, vy;
+    double x, y, r;
+};
+#include <vector>
+#include <cmath>
+
+class Vector
+{
+private:
+    double x, y;
+
+public:
+    Vector(double x, double y) : x{x}, y{y} {}
+    double &getX() { return x; }
+    double &getY() { return y; }
+    double operator*(const Vector &rhs) const
+    {
+        return x * rhs.x + y * rhs.y;
+    }
+    Vector operator*(const double &rhs) const
+    {
+        return Vector(x * rhs, y * rhs);
+    }
+    friend Vector operator*(double rhs, const Vector &lhs)
+    {
+        return Vector(rhs * lhs.x, rhs * lhs.y);
+    }
+    Vector operator-(const Vector &rhs) const
+    {
+        return Vector(x - rhs.x, y - rhs.y);
+    }
+    Vector operator+(const Vector &rhs) const
+    {
+        return Vector(x + rhs.x, y + rhs.y);
+    }
+    double operator~() const
+    {
+        return sqrt(x * x + y * y);
+    }
+    Vector operator-() const
+    {
+        return Vector(-x, -y);
+    }
 };
 
-class Constant : public Function
+class PhysicEngine
 {
-	public:
-	static Constant *create(const double&value)
-    {
-        return new Constant(value);
-    }
-	Function *differential() override
-    {
-        return new Constant(0);
-    }
-	double eval(double) override
-    {
-        return value;
-    }
-    private:
-    double value;
-    Constant(const double &value):value(value){};
-};
+private:
+    unsigned int fps;
+    std::vector<Object> objects;
 
-class Variable : public Function
-{
-	public:
-	static Variable *create(const string &name)
+public:
+    const double g = 9.8;
+    PhysicEngine() : fps{60} {}
+    void setFPS(unsigned int FPS)
     {
-        return new Variable(name);
+        fps = FPS;
     }
-	Function *differential() override
+    unsigned int getFPS()
     {
-        return Constant::create(1);
+        return fps;
     }
-	double eval(double value) override
+    void addObject(const Object &object)
     {
-        return value;
+        objects.push_back(object);
     }
-    private:
-    string name;
-    Variable(const string &name):name(name){};
-};
+    std::vector<Object> getObjects()
+    {
+        return objects;
+    }
+    void update()
+    {
+        double dt = 1.0 / fps;
 
-class Polynomial : public Function
-{
-	public:
-	static Polynomial *create(Function *base, Function *exp)
-    {
-        return new Polynomial(base,exp);
-    }
-	Function *differential() override;
-	double eval(double val) override
-    {
-        return pow(base->eval(val),exp->eval(0));
-    }
-
-    private:
-    Function*base,*exp;
-    Polynomial(Function*base,Function*exp):base(base),exp(exp){};
-};
-
-class Arithmetic : public Function
-{
-	public:
-	static Arithmetic *create(Function *lhs, char op, Function *rhs)
-    {
-        switch(op)
+        for (Object &object : objects)
         {
-            case '+':
-                return new Arithmetic(lhs,rhs,Type::ADD);
-            case '-':
-                return new Arithmetic(lhs,rhs,Type::SUB);
-            case '*':
-                return new Arithmetic(lhs,rhs,Type::MUL);
-            case '/':
-                return new Arithmetic(lhs,rhs,Type::DIV);
+            object.getSpeedY() -= g * dt;
+            object.getX() += object.getSpeedX() * dt;
+            object.getY() = std::max(object.getR(), object.getY() += object.getSpeedY() * dt);
+        }
+
+        for (size_t i = 0; i < objects.size(); i++)
+        {
+            Object &obj1 = objects[i];
+            for (size_t j = i + 1; j < objects.size(); j++)
+            {
+                Object &obj2 = objects[j];
+                double dx = obj1.getX() - obj2.getX();
+                double dy = obj1.getY() - obj2.getY();
+                double dr = obj1.getR() + obj2.getR();
+                if ((dx * dx + dy * dy) < dr * dr)
+                {
+                    double w1 = obj1.getWeight();
+                    double w2 = obj2.getWeight();
+                    Vector v1 = Vector(obj1.getSpeedX(), obj1.getSpeedY());
+                    Vector v2 = Vector(obj2.getSpeedX(), obj2.getSpeedY());
+                    Vector dv = v1 - v2;
+                    Vector dp = Vector(dx, dy);
+                    Vector u1 = v1 - ((2 * w2 / (w1 + w2)) * (dv * dp) / ((~dp) * (~dp))) * dp;
+                    Vector u2 = v2 - ((2 * w1 / (w1 + w2)) * ((-dv) * (-dp)) / ((~dp) * (~dp))) * (-dp);
+                    obj1.setSpeed(u1.getX(), u1.getY());
+                    obj2.setSpeed(u2.getX(), u2.getY());
+
+                    double d = sqrt(dx * dx + dy * dy);
+                    double overlap = dr - d;
+                    double overlapX = overlap * dx / d;
+                    double overlapY = overlap * dy / d;
+                    obj1.getX() += overlapX / 2;
+                    obj1.getY() += overlapY / 2;
+                    obj2.getX() -= overlapX / 2;
+                    obj2.getY() -= overlapY / 2;
+                }
+            }
+        }
+        for (Object &object : objects)
+        {
+            if (object.getY() - object.getR() <= 0)
+            {
+                object.getSpeedY() = std::abs(object.getSpeedY());
+            }
         }
     }
-	Function *differential() override
-    {
-        switch(type)
-        {
-            case Type::ADD:
-            case Type::SUB:
-                return new Arithmetic{lhs->differential(),rhs->differential(),type};
-            case Type::MUL:
-                return new Arithmetic{
-                new Arithmetic{lhs->differential(),rhs,Type::MUL},
-                new Arithmetic{lhs,rhs->differential(),Type::MUL},
-                Type::ADD
-                };
-            case Type::DIV:
-                return new Arithmetic {
-                    new Arithmetic{
-                        new Arithmetic{lhs->differential(),rhs,Type::MUL},
-                        new Arithmetic{lhs,rhs->differential(),Type::MUL},
-                        Type::SUB}
-                ,
-                Polynomial::create(rhs,Constant::create(2)),
-                Type::DIV
-                };
-        }
-    }
-	double eval(double value) override
-    {
-        switch(type)
-        {
-            case Type::ADD:
-                return lhs->eval(value)+rhs->eval(value);
-            case Type::SUB:
-                return lhs->eval(value)-rhs->eval(value);
-            case Type::MUL:
-                return lhs->eval(value)*rhs->eval(value);
-            case Type::DIV:
-                return lhs->eval(value)/rhs->eval(value);
-        }
-    }
-
-    private:
-    enum class Type
-    {
-        ADD,
-        SUB,
-        MUL,
-        DIV
-    };
-    Function*lhs,*rhs;
-    Type type;
-    Arithmetic(Function*lhs,Function*rhs,Type type):lhs(lhs),rhs(rhs),type(type){};
 };
-
-class Sin : public Function
-{
-	public:
-	static Sin *create(Function *base)
-    {
-        return new Sin(base);
-    }
-	Function *differential() override;
-	double eval(double val) override
-    {
-        return sin(base->eval(val));
-    }
-    private:
-    Sin(Function*base):base(base){}
-    Function*base;
-};
-
-class Cos : public Function
-{
-	public:
-	static Cos *create(Function *base)
-    {
-        return new Cos(base);
-    }
-	Function *differential() override
-    {
-        return Arithmetic::create(
-            Constant::create(0),
-            '-',
-            Arithmetic::create(Sin::create(base),'*',base->differential())
-        );
-    }
-	double eval(double val) override
-    {
-        return cos(base->eval(val));
-    }
-
-    private:
-    Cos(Function*base):base(base){}
-    Function*base;
-
-};
-
-Function* Polynomial::differential()
-{
-    return Arithmetic::create(
-        Arithmetic::create(
-            Polynomial::create(base,Arithmetic::create(exp,'-',Constant::create(1))),
-            '*',
-            exp),
-            '*',
-            base->differential()
-    );
-}
-
-Function* Sin::differential()
-{
-    return Arithmetic::create(Cos::create(base),'*',base->differential());
-}
-

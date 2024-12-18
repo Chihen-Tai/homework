@@ -33,7 +33,7 @@ int main()
         cin>>op;
         if(op=="insert")
         {
-            cin>>s;;
+            cin>>s;
             mst.insert(s);
             v.push_back(s);
         }
@@ -56,13 +56,13 @@ int main()
             cin>>idx;
             if(idx<v.size())
             {
-                cout<<v[idx-1]<<endl;
+                cout<<v[--idx]<<endl;
             }
         }
         if(op=="amount")
         {
             cin>>s;
-            cout<<mst.count(s)<<endl;
+            cout<<mst.amount(s)<<endl;
         }
     }
 }

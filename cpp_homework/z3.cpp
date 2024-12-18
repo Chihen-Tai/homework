@@ -1,151 +1,71 @@
 #include <iostream>
-#include <vector>
-#include <cmath>
-class Object
+#include <string>
+#include <map>
+
+using namespace std;;
+
+bool isvowel(char c)
 {
-public:
-    Object(double W) : weight{W}, vx{0}, vy{0}, x{0}, y{0}, r{0} {}
-    void setCircle(double X, double Y, double R)
-    {
-        x = X, y = Y, r = R;
-    }
-    void setSpeed(double Vx, double Vy)
-    {
-        vx = Vx, vy = Vy;
-    }
-    double &getSpeedX() { return vx; }
-    double &getSpeedY() { return vy; }
-    double &getX() { return x; }
-    double &getY() { return y; }
-    double &getR() { return r; }
-    const double &getWeight() const { return weight; }
-    const double &getSpeedX() const { return vx; }
-    const double &getSpeedY() const { return vy; }
-    double getVelocity() const { return sqrt(vx * vx + vy * vy); }
-    double getAngle() const { return atan2(vy, vx) * 180.0 / M_PI; }
-    const double &getX() const { return x; }
-    const double &getY() const { return y; }
-    const double &getR() const { return r; }
+    return c=='a'||c=='e'||c=='i'||c=='o'||c=='u';
+}
 
-private:
-    double weight;
-    double vx, vy;
-    double x, y, r;
-};
-
-class Vector
+int count_vowel(string s)
 {
-private:
-    double x,y;
-public:
-    Vector(double X,double Y):x{X},y{Y}{}
-    double &getX(){return x;}
-    double &getY(){return y;}
-    double operator*(const Vector &rhs)const
+    int count=0;
+    for(auto c:s)
     {
-        return x*rhs.x+y*rhs.y;
-    }
-    Vector operator*(const double &rhs)const
-    {
-        return Vector(x*rhs,y*rhs);
-    }
-    friend Vector operator*(double lhs,const Vector &rhs)
-    {
-        return Vector(lhs*rhs.x,lhs*rhs.y);
-    }
-    Vector operator+(const Vector &rhs)
-    {
-        return Vector(x+rhs.x,y+rhs.y);
-    }
-    Vector operator-(const Vector &rhs)
-    {
-        return Vector(x-rhs.x,y-rhs.y);
-    }
-    double operator~() const
-    {
-        return sqrt(x*x+y*y);
-    }
-
-    Vector operator-() const
-    {
-        return Vector(-x,-y);
-    }
-};
-
-class PhysicEngine
-{
-    private:
-    unsigned int fps;
-    std::vector<Object> objects;
-    public:
-    static constexpr double g=9.8;
-    PhysicEngine():fps{60}{}
-    void setFPS(unsigned int FPS)
-    {
-        fps=FPS;
-    };
-    unsigned int getFPS() const {return fps;}
-    void addObject(const Object &object)
-    {
-        objects.emplace_back(object);
-    }
-    void reset()
-    {
-        objects.clear();
-    }
-    std::vector<Object> getObjects()
-    {
-        return objects;
-    }
-    void update()
-    {
-        double dt=1.0/fps;
-        for(Object &object:objects)
+        if(isvowel(c))
         {
-            object.getSpeedY()-=g*dt;
-            object.getX()+=object.getSpeedX()*dt;
-            object.getY()=std::max(object.getR(),object.getY()+object.getSpeedY()*dt);
-        }
-        for(size_t i=0;i<objects.size();i++)
-        {
-            Object &obj1=objects[i];
-            for(size_t j=i+1;j<objects.size();j++)
-            {
-                Object &obj2=objects[j];
-                double dx=obj1.getX()-obj2.getX();
-                double dy=obj1.getY()-obj2.getY();
-                double dr=obj1.getR()+obj2.getR();
-                if(dx*dx+dy*dy<dr*dr)
-                {
-                    double w1=obj1.getWeight();
-                    double w2=obj2.getWeight();;
-                    Vector v1(obj1.getSpeedX(),obj1.getSpeedY());
-                    Vector v2(obj2.getSpeedX(),obj2.getSpeedY());
-                    Vector dv=v1-v2;
-                    Vector dp=Vector(dx,dy);
-                    Vector u1=v1-((2*w2/(w1+w2))*(dv*dp/(~dp*~dp)))*dp;
-                    Vector u2=v2-((2*w1/(w1+w2))*((-dv)*(-dp)/(~dp*~dp)))*(-dp);
-                    obj1.setSpeed(u1.getX(),u1.getY());
-                    obj2.setSpeed(u2.getX(),u2.getY());
-
-                    double d = sqrt(dx*dx+dy*dy);
-                    double overlap=dr-d;
-                    double overlapX=overlap*dx/d;
-                    double overlapY=overlap*dy/d;
-                    obj1.getX()+=overlapX/2;
-                    obj1.getY()+=overlapY/2;
-                    obj2.getX()-=overlapX/2;
-                    obj2.getY()-=overlapY/2;
-                }
-            }
-        }
-
-        for(Object &object:objects)
-        {
-            if(object.getY()-object.getR()<=0)
-            {
-                object.getSpeedY()=std::abs( object.getSpeedY());
-            }
+            count++;
         }
     }
-};
+    return count;
+}
+
+char last_vowel(string s)
+{
+    char last=' ';
+    for(auto c:s)
+    {
+        if(isvowel(c))
+        {
+            last=c;
+        }
+    }
+    return last;
+}
+
+int main()
+{
+    int n;
+    string s;
+    map<int,map<char,int>> words;
+    cin>>n;
+    while(n--)
+    {
+        cin>>s;
+        words[count_vowel(s)][last_vowel(s)]++;
+    }
+
+    int pair_first=0;
+    int pair_both=0;
+
+    for(auto count:words)
+    {
+        int temp=0;
+        for(auto last:count.second)
+        {
+            pair_both+=last.second/2;
+            temp+=last.second%2;
+        }
+        pair_first+=temp/2;
+    }
+
+    int ans=min(pair_first,pair_both);
+    int diff=pair_both-pair_first;
+    if(diff>=2)
+    {
+        ans+=diff/2;
+    }
+    cout<<ans<<endl;
+}
